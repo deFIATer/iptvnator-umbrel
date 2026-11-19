@@ -1,0 +1,61 @@
+name: Auto-update IPTVnator Release
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Runs every 6 hours
+  workflow_dispatch:      # Allows manual trigger in GitHub Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  check-and-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for new IPTVnator release
+        id: check
+        run: |
+          LATEST_JSON=$(curl -fsSL https://api.github.com/repos/4gray/iptvnator/releases/latest)
+          LATEST_TAG=$(echo "$LATEST_JSON" | jq -r .tag_name | sed 's/^v//')
+          echo "latest_version=$LATEST_TAG" >> "$GITHUB_OUTPUT"
+          
+          CURRENT_VERSION=$(grep '^version:' iptvnator-app/umbrel-app.yml | sed -E 's/version: *"v?([^"]+)".*/\1/')
+          echo "current_version=$CURRENT_VERSION" >> "$GITHUB_OUTPUT"
+          
+          echo "Latest upstream version: $LATEST_TAG"
+          echo "Current app store version: $CURRENT_VERSION"
+          
+          if [ -n "$LATEST_TAG" ] && [ "$LATEST_TAG" != "null" ] && [ "$LATEST_TAG" != "$CURRENT_VERSION" ]; then
+            echo "has_update=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_update=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Apply update and push
+        if: steps.check.outputs.has_update == 'true'
+        run: |
+          NEW_VER="${{ steps.check.outputs.latest_version }}"
+          echo "Applying update to IPTVnator v${NEW_VER}..."
+          
+          python3 -c "
+          import re
+          with open('iptvnator-app/umbrel-app.yml', 'r') as f:
+              content = f.read()
+
+          content = re.sub(r'version:\s*\"?[^\s\n\"]+\"?', f'version: \"${NEW_VER}\"', content)
+          new_notes = f'''releaseNotes: >-\n  Updated to IPTVnator v${NEW_VER}. Release details: https://github.com/4gray/iptvnator/releases/tag/v${NEW_VER}'''
+          content = re.sub(r'releaseNotes:\s*>-\n\s+.*', new_notes, content)
+
+          with open('iptvnator-app/umbrel-app.yml', 'w') as f:
+              f.write(content)
+          "
+          
+          # Git commit and push
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add iptvnator-app/umbrel-app.yml
+          git commit -m "chore(release): bump IPTVnator to v${NEW_VER}"
+          git push

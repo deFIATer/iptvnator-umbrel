@@ -1,0 +1,43 @@
+manifestVersion: 1
+id: iptvnator-app
+name: IPTVnator
+tagline: Modern IPTV player & backend for LG webOS / Tizen Smart TVs
+category: media
+version: "0.25.0"
+port: 4333
+description: >-
+  IPTVnator is an open-source video player application that supports IPTV playlists
+  (m3u, m3u8), Xtream Codes API, and Stalker portals.
+
+
+  ⚡ FEATURES ON UMBREL:
+
+
+  - Companion backend for LG webOS and Samsung Tizen Smart TVs.
+
+  - Full web player and management interface accessible directly in your browser.
+
+  - QR code pairing to easily add playlists and credentials from your smartphone.
+
+  - Centralized server storage for your playlists and favorites.
+
+  - High-performance proxy with 512MB response buffers for massive IPTV catalogs.
+developer: 4gray
+website: https://github.com/4gray/iptvnator
+submitter: deFIATer
+submission: https://github.com/4gray/iptvnator
+repo: https://github.com/4gray/iptvnator
+support: https://github.com/4gray/iptvnator/issues
+gallery:
+  - https://raw.githubusercontent.com/4gray/iptvnator/master/apps/tv/docs/screenshots/home.webp
+  - https://raw.githubusercontent.com/4gray/iptvnator/master/apps/tv/docs/screenshots/movie-details.webp
+  - https://raw.githubusercontent.com/4gray/iptvnator/master/apps/tv/docs/screenshots/series-details.webp
+icon: https://raw.githubusercontent.com/deFIATer/iptvnator-umbrel/main/iptvnator-app/icon.png
+releaseNotes: >-
+  Initial Umbrel packaging for IPTVnator v0.25.0 with full companion TV backend, large buffer support, and persistent server storage.
+dependencies: []
+path: ""
+defaultUsername: ""
+defaultPassword: ""
+storage:
+  dataRoot: data

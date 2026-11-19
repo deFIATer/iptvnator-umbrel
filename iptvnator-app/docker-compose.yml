@@ -1,0 +1,22 @@
+version: "3.7"
+
+services:
+  app_proxy:
+    environment:
+      APP_HOST: iptvnator-app_server_1
+      APP_PORT: 80
+
+  server:
+    image: 4gray/iptvnator:latest
+    restart: unless-stopped
+    environment:
+      BACKEND_URL: /api
+      CLIENT_URL: "*"
+      PORT: "3000"
+      IPTVNATOR_PROXY_ALLOW_PRIVATE_NETWORKS: "1"
+      IPTVNATOR_STORAGE: server
+      IPTVNATOR_MAX_PROVIDER_RESPONSE_MB: "512"
+      IPTVNATOR_MAX_DOCUMENT_MB: "512"
+      NODE_OPTIONS: "--max-old-space-size=4096"
+    volumes:
+      - ${APP_DATA_DIR}/data:/data
